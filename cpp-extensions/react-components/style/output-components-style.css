@@ -1,0 +1,143 @@
+/* Output component styling */
+/* Main container*/
+.output-container {
+    display: flex;
+    color: var(--theia-ui-font-color0)
+}
+
+.widget-handle {
+    background-color: var(--theia-layout-color4);
+    display: grid;
+    grid-template-rows: 25px 1fr;
+}
+.widget-handle :hover {
+    background-color: var(--theia-list-hoverBackground); 
+}
+.title-bar-label {
+    text-align: center;
+    writing-mode: vertical-rl;
+    height: 100%;
+    min-height: 150px;
+    transform: rotate(180deg);
+    user-select: none;
+    align-self: center;
+    justify-self: center;
+    cursor: move;
+}
+.remove-component-button {
+    background: none;
+    border: none;
+    padding: 2px 8px;
+    align-self: center;
+    justify-self: center;
+    color: var(--theia-ui-font-color0)
+}
+
+.main-output-container {
+    display: flex;
+}
+
+.output-component-tree {
+    overflow-y: scroll;
+    white-space: pre-wrap;
+}
+
+.output-component-chart {
+    align-self: center;
+    text-align: center;
+}
+
+#timegraph-main {
+    width: 100%;
+    display: flex;
+}
+
+#xy-main {
+    width: 100%;
+    display: flex;
+}
+
+#main {
+    border: 1px solid;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+}
+
+.innerContainer {
+    width: 100%;
+}
+
+.analysis-running {
+    font-size: 24px;
+    text-align: center;
+    position: relative;
+    transform: translate(0, -50%);
+    top: 50%;
+    width: 90%;
+    align-self: center;
+}
+
+.table-tree>tbody>tr:nth-child(1)>th {
+    background-color: var(--theia-editor-background);
+    position: sticky;
+    top: 0;
+}
+
+.table-tree th, .table-tree td {
+    padding: 3px 5px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+    border-right: 1px solid #333;
+    white-space: nowrap;
+    min-width: 50px;
+}
+
+.timegraph-tree tr {
+    /* TODO: Fix row alignment, this number is arbitrary, it works [on my machine], but it should match line height in timeline-chart */
+    line-height: 18px;
+    position: relative;
+    white-space: nowrap;
+    top: 50%;
+    padding: 0 0;
+}
+
+#input-filter-tree {
+    background-color: var(--theia-input-background);
+    border: none;
+    border-bottom: 1px solid var(--theia-input-foreground);
+    padding: 3px;
+    width: 180px;
+    color: var(--theia-input-placeholder-foreground)
+}
+
+.ag-theme-balham{
+    font-family: var(--theia-ui-font-family) !important;
+    font-size: var(--theia-content-font-size) !important;
+}
+
+.ag-theme-balham-dark{
+    font-family: var(--theia-ui-font-family) !important;
+    font-size: var(--theia-content-font-size) !important;
+}
+
+.ag-theme-balham-dark .ag-row-selected {
+    background-color: var(--theia-selection-background) !important;
+}
+
+.ag-header-row:nth-child(2) > .ag-header-cell {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.ag-floating-filter-full-body:hover {
+    background-color: var(--theia-list-hoverBackground) !important;
+    cursor: pointer !important;
+}
+
+.hoverClass:hover {
+    border: 1px solid black;
+}

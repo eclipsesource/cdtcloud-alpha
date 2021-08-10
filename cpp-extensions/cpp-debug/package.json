@@ -58,7 +58,8 @@
     "rimraf": "^2.6.2",
     "tar": "^4.0.0",
     "unzip-stream": "^0.3.0",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "typescript": "latest"
   },
   "adapters": {
     "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.90-theia.2/cdt-gdb-vscode-0.0.90-theia.2.tgz"

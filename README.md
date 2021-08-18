@@ -26,6 +26,8 @@ Building and using cdt.cloud blueprint:
 - you can now debug
 - for trace compass right click on the `car-kernel` folder -> open with -> Trace Viewer
 
+The steps above are also available as two scripts: run.sh and build.sh
+
 </div>
 
 [![Installers](https://img.shields.io/badge/download-installers-blue.svg?style=flat-curved)](https://theia-ide.org/docs/blueprint_download/)

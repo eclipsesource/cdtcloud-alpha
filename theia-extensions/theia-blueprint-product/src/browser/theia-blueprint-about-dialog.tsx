@@ -16,20 +16,32 @@
 import * as React from 'react';
 
 import { AboutDialog, AboutDialogProps, ABOUT_CONTENT_CLASS } from '@theia/core/lib/browser/about-dialog';
-import { injectable, inject } from 'inversify';
+import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { renderDocumentation, renderDownloads, renderSourceCode, renderTickets, renderWhatIs, renderWhatIsNot } from './branding-util';
-import { VSXApiVersionProvider } from '@theia/vsx-registry/lib/common/vsx-api-version-provider';
+import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 
 @injectable()
 export class TheiaBlueprintAboutDialog extends AboutDialog {
 
-    @inject(VSXApiVersionProvider)
-    protected readonly apiVersionProvider: VSXApiVersionProvider;
+    @inject(VSXEnvironment)
+    protected readonly environment: VSXEnvironment;
+
+    @inject(WindowService)
+    protected readonly windowService: WindowService;
+
+    protected vscodeApiVersion: string;
 
     constructor(
         @inject(AboutDialogProps) protected readonly props: AboutDialogProps
     ) {
         super(props);
+    }
+
+    @postConstruct()
+    protected async init(): Promise<void> {
+        this.vscodeApiVersion = await this.environment.getVscodeApiVersion();
+        super.init();
     }
 
     protected render(): React.ReactNode {
@@ -49,7 +61,7 @@ export class TheiaBlueprintAboutDialog extends AboutDialog {
             <hr className='gs-hr' />
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderWhatIs()}
+                    {renderWhatIs(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
@@ -59,17 +71,17 @@ export class TheiaBlueprintAboutDialog extends AboutDialog {
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderTickets()}
+                    {renderTickets(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderSourceCode()}
+                    {renderSourceCode(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderDocumentation()}
+                    {renderDocumentation(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
@@ -95,7 +107,7 @@ export class TheiaBlueprintAboutDialog extends AboutDialog {
             </p>
 
             <p className='gs-sub-header' >
-                {'VS Code API Version: ' + this.apiVersionProvider.getApiVersion()}
+                {'VS Code API Version: ' + this.vscodeApiVersion}
             </p>
         </div>;
     }

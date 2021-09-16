@@ -46,9 +46,6 @@
     "applications/*",
     "applications/c-development/*",
     "theia-extensions/*",
-    "cpp-extensions/*"
-  ],
-  "resolutions": {
-    "@types/react": "16.14.11"
-  }
+    "cpp-extensions/theia-cpp-extensions/packages/*"
+  ]
 }

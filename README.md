@@ -10,14 +10,10 @@
 Eclipse Theia Blueprint is a template for building desktop-based products based on the Eclipse Theia platform.
 
 Building and using cdt.cloud blueprint:
+
 - use node 12
-- increase memory for node: `export NODE_OPTIONS=--max_old_space_size=4096`
 - run `yarn` in root folder
-- go to `cpp-extensions/viewer-prototype` run `npm run build`
-- go to `cpp-extensions/cpp-debug` run `npm run build`
-- go to `cpp-extensions/react-components` run `npm run build`
-- go to `cpp-extensions/base` run `npm run build`
-- run `yarn` in root again
+- go to `cpp-extensions/theia-cpp-extensions` run `yarn`
 - go to `example` extract `trace-compass-server.tar.gz`
 - go to `example/trace-compass-server` start `tracecompass-server`
 - go to `applications/c-development/electron` run `npm start`
@@ -52,7 +48,7 @@ Eclipse Theia Blueprint is a **template** for building desktop-based products ba
 
 ## What is it not?
 
-Eclipse Theia Blueprint is ***not*** **a production-ready product**. Therefore, it is also not meant to be a replacement for Visual Studio Code or any other IDE.
+Eclipse Theia Blueprint is **_not_** **a production-ready product**. Therefore, it is also not meant to be a replacement for Visual Studio Code or any other IDE.
 
 ## Development
 

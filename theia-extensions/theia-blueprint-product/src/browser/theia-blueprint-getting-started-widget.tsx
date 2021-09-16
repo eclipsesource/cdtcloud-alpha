@@ -15,17 +15,30 @@
  ********************************************************************************/
 import * as React from 'react';
 
-import { inject, injectable } from 'inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { renderDocumentation, renderDownloads, renderSourceCode, renderTickets, renderWhatIs, renderWhatIsNot } from './branding-util';
 
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
-import { VSXApiVersionProvider } from '@theia/vsx-registry/lib/common/vsx-api-version-provider';
+import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 
 @injectable()
 export class TheiaBlueprintGettingStartedWidget extends GettingStartedWidget {
 
-    @inject(VSXApiVersionProvider)
-    protected readonly apiVersionProvider: VSXApiVersionProvider;
+    @inject(VSXEnvironment)
+    protected readonly environment: VSXEnvironment;
+
+    @inject(WindowService)
+    protected readonly windowService: WindowService;
+
+    protected vscodeApiVersion: string;
+
+    @postConstruct()
+    protected async init(): Promise<void> {
+        super.init();
+        this.vscodeApiVersion = await this.environment.getVscodeApiVersion();
+        this.update();
+    }
 
     protected render(): React.ReactNode {
         return <div className='gs-container'>
@@ -38,7 +51,7 @@ export class TheiaBlueprintGettingStartedWidget extends GettingStartedWidget {
             <hr className='gs-hr' />
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderWhatIs()}
+                    {renderWhatIs(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
@@ -48,17 +61,17 @@ export class TheiaBlueprintGettingStartedWidget extends GettingStartedWidget {
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderTickets()}
+                    {renderTickets(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderSourceCode()}
+                    {renderSourceCode(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
                 <div className='col'>
-                    {renderDocumentation()}
+                    {renderDocumentation(this.windowService)}
                 </div>
             </div>
             <div className='flex-grid'>
@@ -108,7 +121,7 @@ export class TheiaBlueprintGettingStartedWidget extends GettingStartedWidget {
             </p>
 
             <p className='gs-sub-header' >
-                {'VS Code API Version: ' + this.apiVersionProvider.getApiVersion()}
+                {'VS Code API Version: ' + this.vscodeApiVersion}
             </p>
         </div>;
     }

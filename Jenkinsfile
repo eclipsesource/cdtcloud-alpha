@@ -5,6 +5,10 @@ import groovy.json.JsonSlurper
 
 distFolder = "applications/electron/dist"
 releaseBranch = "master"
+// Attempt to detect that a PR is Jenkins-related, by looking-for 
+// the word "jenkins" (case insensitive) in PR branch name and/or 
+// the PR title
+jenkinsRelatedRegex = "(?i).*jenkins.*"
 
 pipeline {
     agent none
@@ -12,8 +16,26 @@ pipeline {
         timeout(time: 5, unit: 'HOURS')
         disableConcurrentBuilds()
     }
+    environment {
+        BLUEPRINT_JENKINS_CI = 'true'
+    }
     stages {
         stage('Build') {
+            // only proceed when merging on the release branch or if the 
+            // PR seems Jenkins-related
+            when {
+                anyOf {
+                    expression {
+                        env.JOB_BASE_NAME ==~ /$releaseBranch/
+                    }
+                    expression { 
+                        env.CHANGE_BRANCH ==~ /$jenkinsRelatedRegex/ 
+                    }
+                    expression {
+                        env.CHANGE_TITLE ==~ /$jenkinsRelatedRegex/
+                    }
+                }
+            }
             parallel {
                 stage('Create Linux Installer') {
                     agent {
@@ -105,6 +127,21 @@ spec:
             }
         }
         stage('Sign and Upload') {
+            // only proceed when merging on the release branch or if the 
+            // PR seems Jenkins-related
+            when {
+                anyOf {
+                    expression {
+                        env.JOB_BASE_NAME ==~ /$releaseBranch/
+                    }
+                    expression { 
+                        env.CHANGE_BRANCH ==~ /$jenkinsRelatedRegex/ 
+                    }
+                    expression {
+                        env.CHANGE_TITLE ==~ /$jenkinsRelatedRegex/
+                    }
+                }
+            }
             parallel {
                 stage('Upload Linux') {
                     agent any
@@ -127,12 +164,66 @@ spec:
                     }
                 }
                 stage('Sign and Upload Windows') {
-                    agent any
+                    agent {
+                        kubernetes {
+                            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: theia-dev
+    image: eclipsetheia/theia-blueprint
+    command:
+    - cat
+    tty: true
+    resources:
+      limits:
+        memory: "8Gi"
+        cpu: "2"
+      requests:
+        memory: "8Gi"
+        cpu: "2"
+    volumeMounts:
+    - name: global-cache
+      mountPath: /.cache
+    - name: global-yarn
+      mountPath: /.yarn      
+    - name: global-npm
+      mountPath: /.npm      
+    - name: electron-cache
+      mountPath: /.electron-gyp
+  - name: jnlp
+    volumeMounts:
+    - name: volume-known-hosts
+      mountPath: /home/jenkins/.ssh
+  volumes:
+  - name: global-cache
+    emptyDir: {}
+  - name: global-yarn
+    emptyDir: {}
+  - name: global-npm
+    emptyDir: {}
+  - name: electron-cache
+    emptyDir: {}
+  - name: volume-known-hosts
+    configMap:
+      name: known-hosts
+"""
+                        }
+                    }
                     steps {
                         unstash 'win'
-                        script {
-                            signInstaller('exe', 'winsign')
-                            uploadInstaller('windows')
+                        container('theia-dev') {
+                            script {
+                                signInstaller('exe', 'winsign')
+                                updateMetadata('TheiaBlueprint.exe', 'latest.yml')
+                            }
+                        }
+                        container('jnlp') {
+                            script {
+                                uploadInstaller('windows')
+                                copyInstaller('windows', 'TheiaBlueprint', 'exe')
+                            }
                         }
                     }
                 }
@@ -203,6 +294,11 @@ def notarizeInstaller(String ext) {
     }
 }
 
+def updateMetadata(String executable, String yaml) {
+    sh "yarn install --force"
+    sh "yarn electron update:checksum -e ${executable} -y ${yaml}"
+}
+
 def uploadInstaller(String platform) {
     if (env.BRANCH_NAME == releaseBranch) {
         def packageJSON = readJSON file: "package.json"
@@ -217,5 +313,17 @@ def uploadInstaller(String platform) {
         }
     } else {
         echo "Skipped upload for branch ${env.BRANCH_NAME}"
+    }
+}
+
+def copyInstaller(String platform, String installer, String extension) {
+    if (env.BRANCH_NAME == releaseBranch) {
+        def packageJSON = readJSON file: "package.json"
+        String version = "${packageJSON.version}"
+        sshagent(['projects-storage.eclipse.org-bot-ssh']) {
+            sh "ssh genie.theia@projects-storage.eclipse.org cp /home/data/httpd/download.eclipse.org/theia/latest/${platform}/${installer}.${extension} /home/data/httpd/download.eclipse.org/theia/latest/${platform}/${installer}-${version}.${extension}"
+        }
+    } else {
+        echo "Skipped copying installer for branch ${env.BRANCH_NAME}"
     }
 }

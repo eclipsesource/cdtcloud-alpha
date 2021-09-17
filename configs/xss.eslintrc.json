@@ -1,6 +1,11 @@
 {
-  "extends": ["plugin:no-unsanitized/DOM"],
-  "plugins": ["no-unsanitized", "react"],
+  "extends": [
+    "plugin:no-unsanitized/DOM"
+  ],
+  "plugins": [
+    "no-unsanitized",
+    "react"
+  ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -8,16 +13,22 @@
   },
   "rules": {
     "no-unsanitized/method": [
-      "warn", {
+      "warn",
+      {
         "escape": {
-          "methods": ["DOMPurify.sanitize"]
+          "methods": [
+            "DOMPurify.sanitize"
+          ]
         }
       }
     ],
     "no-unsanitized/property": [
-      "warn", {
+      "warn",
+      {
         "escape": {
-          "methods": ["DOMPurify.sanitize"]
+          "methods": [
+            "DOMPurify.sanitize"
+          ]
         }
       }
     ],

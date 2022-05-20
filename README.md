@@ -1,3 +1,5 @@
+**This repository moved to https://github.com/eclipse-cdt-cloud/cdt-cloud-blueprint**
+
 <br/>
 <div id="theia-logo" align="center">
     <br />
